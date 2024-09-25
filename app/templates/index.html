@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #events {
+            margin-top: 20px;
+        }
+        .event {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub Events</h1>
+    <div id="events"></div>
+
+    <script>
+        async function fetchEvents() {
+            try {
+                const response = await fetch('/api/events'); //hitting endpoint
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const events = await response.json();
+                displayEvents(events);
+            } catch (error) {
+                console.error('Error fetching events:', error);
+            }
+        }
+
+        function displayEvents(events) {
+            const eventsDiv = document.getElementById('events');
+            eventsDiv.innerHTML = '';  // Clear existing events
+            events.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event';
+                eventDiv.innerHTML = `<strong>${event.author}</strong> ${event.action} to branch <strong>${event.to_branch || event.from_branch}</strong> at ${new Date(event.timestamp).toLocaleString()}`;
+                eventsDiv.appendChild(eventDiv);
+            });
+        }
+
+        // Fetch events every 15 seconds
+        fetchEvents();  // Initial fetch
+        setInterval(fetchEvents, 15000);  // Fetch every 15 seconds
+    </script>
+</body>
+</html>
